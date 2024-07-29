@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { AddEmployeeDto } from "./dto/addEmployee.dto";
 import { Employee } from "src/schemas/Employees.schema";
 import { EmployeesService } from "./employees.service";
 import { UpdateEmployeeDto } from "./dto/updateEmployee.dto";
+import { AuthGuard } from "src/auth/auth.guard";
 @Controller('employees')
 export class employeesController{
     constructor(private readonly employeeService: EmployeesService) {}
@@ -15,7 +16,7 @@ export class employeesController{
   async getAllEmployees(): Promise<Employee[]> {
     return this.employeeService.getAllEmployees();
   }
-
+  
   @Get(':id')
   async getEmployeeById(@Param('id') id: string): Promise<Employee> {
     return this.employeeService.getEmployeeById(id);

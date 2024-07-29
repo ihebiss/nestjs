@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UseGuards } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { LeaveEmployees } from "src/schemas/LeaveEmployees.schema";
@@ -6,6 +6,7 @@ import { CreateLeaveEmployeesDto } from "./dto/create-leave-employees.dto";
 import { Employee } from "src/schemas/Employees.schema";
 import { LeaveType } from "src/schemas/LeaveTypes.schema";
 import {differenceInCalendarDays} from 'date-fns'
+
 @Injectable()
 export class EmployeesLeavesService{
     constructor(
@@ -92,6 +93,7 @@ export class EmployeesLeavesService{
             }
             return deletedLeaveRequest;
           }
+         
           async findByEmployeeId(employeeId: string): Promise<LeaveEmployees[]> {
             return this.leaveRequestModel.find({ employeeId }).populate('employeeId leaveTypeId').exec();
           }

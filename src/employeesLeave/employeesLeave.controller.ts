@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { EmployeesLeavesService } from "./employeesLeave.service";
 import { CreateLeaveEmployeesDto } from "./dto/create-leave-employees.dto";
 import { LeaveEmployees } from "src/schemas/LeaveEmployees.schema";
+import { AuthGuard } from "nest-keycloak-connect";
+import { Request } from 'express';
 @Controller('employees-leaves')
 export class employeesLeavesController{
    
@@ -13,7 +15,7 @@ export class employeesLeavesController{
             return await this.leaveEmployeesService.create(createLeaveRequestDto);
           } catch (error) {
             console.error('Error creating LeaveRequest:', error);
-            throw error; // Laissez NestJS gérer l'erreur et renvoyer une réponse appropriée
+            throw error; 
           }
         }
         @Get()
@@ -24,10 +26,13 @@ export class employeesLeavesController{
         async findOne(@Param('id') id: string): Promise<LeaveEmployees> {
           return this.leaveEmployeesService.findOne(id);
         }
-        @Get('employee/:id')
-        async findByEmployeeId(@Param('id') id: string): Promise<LeaveEmployees[]> {
-          return this.leaveEmployeesService.findByEmployeeId(id);
-        }
+       
+        @Get('employee')
+        @UseGuards(AuthGuard)
+     async findByEmployeeId(@Req() request: Request) {
+    const employeeId = request.user.sub; 
+    return this.leaveEmployeesService.findOne(employeeId);
+  }
         @Put(':id')
         async update(@Param('id') id: string, @Body() updateLeaveRequestDto: CreateLeaveEmployeesDto): Promise<LeaveEmployees> {
           return this.leaveEmployeesService.update(id, updateLeaveRequestDto);
