@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { Employee } from "src/schemas/Employees.schema";
 import { AddEmployeeDto } from "./dto/addEmployee.dto";
 import { UpdateEmployeeDto } from "./dto/updateEmployee.dto";
@@ -14,6 +14,7 @@ export class EmployeesService {
     @InjectModel(Employee.name) private readonly employeeModel: Model<Employee>,
     @InjectModel(LeaveEmployees.name) private readonly leaveRequestModel: Model<LeaveEmployees>,
     @InjectModel(LeaveType.name) private readonly leaveTypeModel: Model<LeaveType>,
+    
   ) {}
 
   private generateRandomColor(): string {
@@ -56,13 +57,15 @@ export class EmployeesService {
   }
 
   async getEmployeeById(id: string): Promise<Employee> {
-    const employee = await this.employeeModel.findById(id).exec();
+    const employee = await this.employeeModel.findById(id).populate('leaveBalances.subtypes').exec();
     if (!employee) {
       throw new NotFoundException('Employee not found');
     }
     return employee;
   }
-
+  async getManagerByDepartment(department: string): Promise<Employee | null> {
+    return this.employeeModel.findOne({ role: 'Manager', department }).exec();
+  }
   async updateEmployee(id: string, updateEmployeeDto: UpdateEmployeeDto): Promise<Employee> {
     const existingEmployee = await this.employeeModel.findById(id).exec();
     if (!existingEmployee) {
@@ -125,4 +128,29 @@ export class EmployeesService {
 
     await this.employeeModel.findByIdAndUpdate(employeeId, { leaveBalances: updatedBalances }).exec();
   }
+ 
+  async findTeamLeadIdByKeycloakId(keycloakId: string): Promise<string> {
+    try {
+      const employee = await this.employeeModel.findOne({ keycloakId }).populate('_id').exec();
+      
+      if (!employee) {
+        console.error(`Employee not found for keycloakId: ${keycloakId}`);
+        throw new NotFoundException(`Employee not found for keycloakId: ${keycloakId}`);
+      }
+      
+      if (!employee._id) {
+        console.error(`TeamLeadId is not set for employee with keycloakId: ${keycloakId}`);
+        throw new NotFoundException(`TeamLeadId is not set for employee with keycloakId: ${keycloakId}`);
+      }
+      
+      return employee._id.toString();
+    } catch (error) {
+      console.error(`Error finding team lead ID for keycloakId ${keycloakId}:`, error);
+      throw new NotFoundException(`Error finding team lead ID for keycloakId ${keycloakId}.`);
+    }
+  }
+  async getEmployeesByTeamLead(teamLeadId: string): Promise<Employee[]> {
+    return this.employeeModel.find({ TeamLeadId: new Types.ObjectId(teamLeadId) }).exec();
+  }
+ 
 }

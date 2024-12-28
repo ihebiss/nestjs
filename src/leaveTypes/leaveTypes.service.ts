@@ -4,21 +4,22 @@ import { Model } from "mongoose";
 import { LeaveType } from "src/schemas/LeaveTypes.schema";
 import { CreateLeaveTypeDto } from "./dto/create-leave-type.dto";
 import { UpdateLeaveTypeDto } from "./dto/update-leave-type.dto";
+import { Subtype } from "src/schemas/Subtype.schema";
+
 
 @Injectable()
 export class leaveTypesService {
-    constructor(@InjectModel(LeaveType.name) private readonly leaveTypeModel: Model<LeaveType>) {}
+    constructor(@InjectModel(LeaveType.name) private readonly leaveTypeModel: Model<LeaveType>,
+    @InjectModel(Subtype.name) private readonly subtypeModel: Model<Subtype> ) {}
 
     async create(createLeaveTypeDto: CreateLeaveTypeDto): Promise<LeaveType> {
-      console.log('Received DTO:', createLeaveTypeDto);
       const createdLeaveType = new this.leaveTypeModel(createLeaveTypeDto);
       return createdLeaveType.save();
     }
-    
-  
 
     async findAll(): Promise<LeaveType[]> {
-        return this.leaveTypeModel.find().exec();
+        const leaveTypes = await this.leaveTypeModel.find().populate('subtypes').exec();
+        return leaveTypes;
     }
 
     async findOne(id: string): Promise<LeaveType> {
@@ -43,5 +44,23 @@ export class leaveTypesService {
             throw new NotFoundException('LeaveType not found');
         }
         return deletedLeaveType;
+    }
+    async addSubtypesToLeaveType(leaveTypeId: string, subtypesDto: { name: string, nbdays?: number }[]): Promise<LeaveType> {
+        const leaveType = await this.leaveTypeModel.findById(leaveTypeId).exec();
+        if (!leaveType) {
+            throw new NotFoundException(`LeaveType with ID ${leaveTypeId} not found`);
+        }
+
+        const subtypes = await Promise.all(subtypesDto.map(async (subtypeDto) => {
+            let subtype = await this.subtypeModel.findOne({ name: subtypeDto.name }).exec();
+            if (!subtype) {
+                subtype = new this.subtypeModel(subtypeDto);
+                await subtype.save();
+            }
+            return subtype;
+        }));
+
+        leaveType.subtypes = subtypes;
+        return leaveType.save();
     }
 }

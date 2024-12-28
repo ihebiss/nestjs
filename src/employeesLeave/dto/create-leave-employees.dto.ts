@@ -22,10 +22,9 @@ export class CreateLeaveEmployeesDto {
   endPeriod: string;
 
   @IsOptional()
-  subtype: string;
-
+  subtype?: string;
   @IsOptional()
-  @IsEnum(['Pending', 'Approved', 'Rejected'])
+  @IsEnum(['Pending', 'Approved', 'Rejected','Approved by TeamLead'])
   status: string;
 
   @IsOptional()
@@ -33,4 +32,8 @@ export class CreateLeaveEmployeesDto {
 
   @IsOptional()
   attachment: string;
+  @IsOptional()
+   keycloakId: string;
+   @IsOptional()
+   reason: string;
 }

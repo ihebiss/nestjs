@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { Subtype,SubtypeSchema } from './Subtype.schema';
 
+import { Subtype,SubtypeSchema } from './Subtype.schema';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 @Schema()
 export class LeaveType extends Document {
     @Prop({ required: true })

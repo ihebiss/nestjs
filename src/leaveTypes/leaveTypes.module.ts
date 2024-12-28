@@ -9,7 +9,8 @@ import { Subtype,SubtypeSchema } from 'src/schemas/Subtype.schema';
   imports: [
     MongooseModule.forFeature([
       { name: LeaveType.name, schema: LeaveTypeSchema },
-   
+      { name: Subtype.name, schema: SubtypeSchema },
+  
     ]),
   ],
   controllers: [LeaveTypeController],

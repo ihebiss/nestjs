@@ -40,8 +40,11 @@ export class UpdateEmployeeDto {
   @IsOptional()
   @IsString()
    TeamLeadId?: string;
+   @IsOptional() 
+   keycloakId: string;
    @IsOptional()
    @ValidateNested({ each: true })
    @Type(() => LeaveBalanceDto)
    leaveBalances?: LeaveBalanceDto[];
+   
 }

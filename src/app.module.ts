@@ -6,11 +6,13 @@ import { APP_GUARD } from '@nestjs/core';
 import { employeesModule } from './employees/employees.module';
 import { LeaveTypeModule } from './leaveTypes/leaveTypes.module';
 import { employeesLeaveModule } from './employeesLeave/employeesLeave.module';
-import { AuthModule } from './auth/auth.module';
+
 import { KeycloakConnectModule } from 'nest-keycloak-connect';
 import { KeyCloakConfigModule } from './Keycloak/keycloak.module';
 import { KeycloakConfigService } from './Keycloak/keycloak.service';
 import { GlobalKeyCloakGuard } from './Keycloak/auth.guard';
+import { SubtypesModule } from './subtypes/subtypes.module';
+import { NotificationModule } from './notifications/notification.module';
 
 @Module({
   imports: [
@@ -20,7 +22,8 @@ import { GlobalKeyCloakGuard } from './Keycloak/auth.guard';
     LeaveTypeModule,
     employeesLeaveModule,
     KeyCloakConfigModule,
-   
+    SubtypesModule,
+    NotificationModule,
     KeycloakConnectModule.registerAsync({
       useClass: KeycloakConfigService,
     }),

@@ -1,4 +1,4 @@
-// src/leave-type/dto/update-leave-type.dto.ts
+
 import { IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateSubtypeDto } from './create-subtype.dto';

@@ -1,13 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Subtype, SubtypeSchema } from './Subtype.schema';
 @Schema()
 export class LeaveBalance {
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'LeaveType' })
   leaveTypeId: MongooseSchema.Types.ObjectId;
 
-  @Prop({ required: true, default: 0 })
+  @Prop({required: false,default:0})
   balance: number;
+ 
+  @Prop({ type: [SubtypeSchema], default: [] })
+  subtypes: Subtype[];
 }
 
 
@@ -39,6 +43,8 @@ export class Employee extends Document {
 
   @Prop({ type: [LeaveBalance], default: [] })  
   leaveBalances: LeaveBalance[];
+  @Prop({ required: true, unique: true })
+  keycloakId: string;  
 }
 
 

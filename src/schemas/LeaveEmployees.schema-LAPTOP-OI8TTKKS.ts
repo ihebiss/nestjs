@@ -18,7 +18,7 @@ export class LeaveEmployees extends Document {
   endDate: Date;
 
   @Prop({ required: true })
-  startPeriod: string;
+  startPeriod: string; 
 
   @Prop({ required: true })
   endPeriod: string;

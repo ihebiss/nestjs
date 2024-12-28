@@ -27,7 +27,8 @@ export class AddEmployeeDto {
 
 
    department: string;
-
+   @IsNotEmpty()
+   keycloakId: string;
    color?: string;
    TeamLeadId?: string;
    @IsOptional()
